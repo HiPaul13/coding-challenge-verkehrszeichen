@@ -29,16 +29,16 @@ stream.on("data", async (row) => {
   console.log("FIRST ROW FROM CSV:", row);
 }
 
-
   count++;
 
   const observation = {
     latitude: Number(row[0]),
     longitude: Number(row[1]),
     heading: Number(row[2]),
-    type: row[3],
-    speed: row[4] ? Number(row[4]) : null,
+    type: String(row[3]).trim(), 
+    value: row[4] ? String(row[4]).trim() : null
   };
+
 
   try {
     await axios.post(API_URL, observation);

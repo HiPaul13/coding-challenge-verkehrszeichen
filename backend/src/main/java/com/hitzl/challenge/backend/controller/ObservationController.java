@@ -23,7 +23,7 @@ public class ObservationController {
                 ", lon=" + observation.getLongitude() +
                 ", heading=" + observation.getHeading() +
                 ", type=" + observation.getType() +
-                ", speed=" + observation.getSpeed()
+                ", speedLimit=" + observation.getSpeedLimit()
         );
     }
 

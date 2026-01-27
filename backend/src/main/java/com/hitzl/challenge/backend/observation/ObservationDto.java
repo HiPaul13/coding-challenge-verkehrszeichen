@@ -5,8 +5,9 @@ public class ObservationDto {
     private Double latitude;
     private Double longitude;
     private Integer heading;
-    private String type;
-    private Integer speed; 
+    private SignType type;
+    private String value; 
+
 
     public Double getLatitude() {
         return latitude;
@@ -32,20 +33,30 @@ public class ObservationDto {
         this.heading = heading;
     }
 
-    public String getType() {
+    public SignType getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+
+    public void setType(SignType type) {
+        this.type = type; 
     }
 
-    public Integer getSpeed() {
-        return speed;
+    public String getValue() {
+        return value;
     }
 
-    public void setSpeed(Integer speed) {
-        this.speed = speed;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Integer getSpeedLimit() {
+        if (type != SignType.SPEED_LIMIT || value == null) return null;
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }
 
