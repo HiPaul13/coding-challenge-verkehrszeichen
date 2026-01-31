@@ -9,11 +9,12 @@ import java.util.Objects;
 
 public class Cluster {
 
+    private static final double EARTH_RADIUS_M = 6371000.0; // Meter
+
     private final List<ObservationDto> points = new ArrayList<>();
 
-   
-    private final SignType type;   
-    private final String value;    
+    private final SignType type;
+    private final String value;
 
     private double centerLat;
     private double centerLon;
@@ -24,13 +25,24 @@ public class Cluster {
         add(first);
     }
 
-    public boolean canAccept(ObservationDto o, double radius) {
+    public boolean canAccept(ObservationDto o, double radiusMeters) {
         if (!Objects.equals(type, o.getType())) return false;
-     
         if (!Objects.equals(value, o.getValue())) return false;
 
-        return Math.abs(o.getLatitude() - centerLat) <= radius &&
-               Math.abs(o.getLongitude() - centerLon) <= radius;
+        double distM = haversineMeters(centerLat, centerLon, o.getLatitude(), o.getLongitude());
+        return distM <= radiusMeters;
+    }
+
+    private double haversineMeters(double lat1, double lon1, double lat2, double lon2) {
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        double c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
+        return EARTH_RADIUS_M * c;
     }
 
     public void add(ObservationDto o) {
@@ -41,27 +53,27 @@ public class Cluster {
         centerLon = centerLon + (o.getLongitude() - centerLon) / n;
     }
 
-    public double getCenterLat() { 
-        return centerLat; 
+    public double getCenterLat() {
+        return centerLat;
     }
 
     public double getCenterLon() {
-        return centerLon; 
+        return centerLon;
     }
 
-    public Object getType() {
-        return type; 
+    public SignType getType() {
+        return type;
     }
 
-    public String getValue() { 
-        return value; 
+    public String getValue() {
+        return value;
     }
 
-    public int size() { 
-        return points.size(); 
+    public int size() {
+        return points.size();
     }
 
-    public List<ObservationDto> getPoints() { 
-        return points; 
+    public List<ObservationDto> getPoints() {
+        return points;
     }
 }

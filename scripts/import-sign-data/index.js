@@ -20,7 +20,7 @@ const stream = fs.createReadStream(CSV_PATH).pipe(
 stream.on("data", async (row) => {
   stream.pause();
 
-  if (count >= 5) {
+  if (count >= 200) {
     console.log("Stopping after 10 rows");
     stream.destroy(); 
     return;
