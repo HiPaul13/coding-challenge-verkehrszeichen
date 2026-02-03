@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-
 @RequestMapping("/api/observations")
 public class ObservationController {
 
@@ -48,6 +47,18 @@ public class ObservationController {
                 ))
                 .toList();
     }
+
+    @GetMapping("/count")
+    public int countObservations() {
+        return observations.size();
+    }
+
+    @DeleteMapping
+    public void deleteAllObservations() {
+        observations.clear();
+    }
+
+
 }
 
 

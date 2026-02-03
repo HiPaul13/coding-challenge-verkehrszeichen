@@ -20,7 +20,7 @@ const stream = fs.createReadStream(CSV_PATH).pipe(
 stream.on("data", async (row) => {
   stream.pause();
 
-  if (count >= 200) {
+  if (count >= 100) {
     console.log("Stopping after 10 rows");
     stream.destroy(); 
     return;
@@ -43,7 +43,7 @@ stream.on("data", async (row) => {
   try {
     await axios.post(API_URL, observation);
     console.log(`Sent row ${count}`);
-    await delay(300);
+    await delay(100);
   } catch (err) {
     console.error(
       "POST failed:",
