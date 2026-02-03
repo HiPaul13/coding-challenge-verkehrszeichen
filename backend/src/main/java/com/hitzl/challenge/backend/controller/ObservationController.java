@@ -3,6 +3,7 @@ import com.hitzl.challenge.backend.observation.ObservationDto;
 import com.hitzl.challenge.backend.logic.Cluster;
 import com.hitzl.challenge.backend.logic.ClusterDto;
 import com.hitzl.challenge.backend.logic.ClusterLogic;
+import com.hitzl.challenge.backend.logic.ClusterNearbyDto;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,17 @@ public class ObservationController {
     public void deleteAllObservations() {
         observations.clear();
     }
+
+    @GetMapping("/clusters/nearby")
+    public List<ClusterNearbyDto> getClustersNearby(
+        @RequestParam double lat,
+        @RequestParam double lon,
+        @RequestParam(defaultValue = "200") double radius,
+        @RequestParam(defaultValue = "30") double r
+    ) {
+        return new ClusterLogic(r).clusterNearby(observations, r, lat, lon, radius);
+    }
+
 
 
 }
