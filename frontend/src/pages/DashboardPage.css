@@ -1,0 +1,104 @@
+.page {
+  padding: 16px;
+  font-family: sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin: 0 0 12px 0;
+}
+
+.error {
+  color: #b00020;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
+
+.topBar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px 16px;
+  min-width: 320px;
+  text-align: center;
+}
+
+.cardTitle {
+  margin: 0 0 8px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.panel {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.panelTitle {
+  margin-top: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.controls label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.inputSmall {
+  width: 96px;
+}
+
+.inputMed {
+  width: 140px;
+}
+
+.tableWrap {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.table td {
+  border-bottom: 1px solid #eee;
+  padding: 8px;
+}
+
+.right {
+  text-align: right;
+}
+
+/* Responsive: auf schmalen Screens untereinander */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
