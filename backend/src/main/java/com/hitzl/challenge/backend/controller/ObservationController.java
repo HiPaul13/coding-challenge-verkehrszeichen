@@ -9,6 +9,10 @@ import com.hitzl.challenge.backend.observation.ObservationEntity;
 import com.hitzl.challenge.backend.observation.ObservationRepository;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -17,29 +21,40 @@ import java.util.List;
 public class ObservationController {
 
     private final ObservationRepository repo;
+    private static final Logger log = LoggerFactory.getLogger(ObservationController.class);
 
     public ObservationController(ObservationRepository repo) {
         this.repo = repo;
     }
 
     @PostMapping
-    public void receiveObservation(@RequestBody ObservationDto observation) {
-        ObservationEntity e = toEntity(observation);
-        repo.save(e);
+    public ResponseEntity<?> receiveObservation(@RequestBody ObservationDto observation) {
 
-        System.out.println("Received observation:");
-        System.out.println(
-                "lat=" + observation.getLatitude() +
-                        ", lon=" + observation.getLongitude() +
-                        ", heading=" + observation.getHeading() +
-                        ", type=" + observation.getType() +
-                        ", speedLimit=" + observation.getSpeedLimit()
+        String error = validateObservation(observation);
+        if (error != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        ObservationEntity entity = toEntity(observation);
+        repo.save(entity);
+
+        log.info("Received observation lat={}, lon={}, heading={}, type={}, value={}",
+                observation.getLatitude(),
+                observation.getLongitude(),
+                observation.getHeading(),
+                observation.getType(),
+                observation.getValue()
         );
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     @GetMapping("/clusters")
     public List<ClusterDto> getClusters(@RequestParam(defaultValue = "30") double r) {
-        List<ObservationDto> observations = repo.findAll().stream().map(this::toDto).toList();
+
+        List<ObservationDto> observations =
+                repo.findAll().stream().map(this::toDto).toList();
 
         ClusterLogic logic = new ClusterLogic(r);
         List<Cluster> clusters = logic.cluster(observations);
@@ -55,15 +70,6 @@ public class ObservationController {
                 .toList();
     }
 
-    @GetMapping("/count")
-    public long countObservations() {
-        return repo.count();
-    }
-
-    @DeleteMapping
-    public void deleteAllObservations() {
-        repo.deleteAll();
-    }
 
     @GetMapping("/clusters/nearby")
     public List<ClusterNearbyDto> getClustersNearby(
@@ -72,8 +78,55 @@ public class ObservationController {
             @RequestParam(defaultValue = "200") double radius,
             @RequestParam(defaultValue = "30") double r
     ) {
-        List<ObservationDto> observations = repo.findAll().stream().map(this::toDto).toList();
-        return new ClusterLogic(r).clusterNearby(observations, r, lat, lon, radius);
+
+        List<ObservationDto> observations =
+                repo.findAll().stream().map(this::toDto).toList();
+
+        return new ClusterLogic(r)
+                .clusterNearby(observations, r, lat, lon, radius);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> countObservations() {
+        return ResponseEntity.ok(repo.count());
+    }
+
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllObservations() {
+        repo.deleteAll();
+        return ResponseEntity.noContent().build();
+    }
+
+    private String validateObservation(ObservationDto o) {
+
+        if (o == null) return "Request body is missing";
+
+        if (o.getLatitude() == null || o.getLongitude() == null)
+            return "latitude and longitude are required";
+
+        if (o.getType() == null)
+            return "type is required";
+
+        if (o.getValue() == null || o.getValue().isBlank())
+            return "value is required";
+
+        double lat = o.getLatitude();
+        double lon = o.getLongitude();
+
+        if (lat < -90 || lat > 90)
+            return "latitude out of range (-90..90)";
+
+        if (lon < -180 || lon > 180)
+            return "longitude out of range (-180..180)";
+
+        if (o.getHeading() != null) {
+            int h = o.getHeading();
+            if (h < 0 || h > 359)
+                return "heading out of range (0..359)";
+        }
+
+        return null;
     }
 
     private ObservationEntity toEntity(ObservationDto dto) {

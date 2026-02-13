@@ -21,7 +21,6 @@ stream.on("data", async (row) => {
   stream.pause();
 
   if (count >= 100) {
-    console.log("Stopping after 10 rows");
     stream.destroy(); 
     return;
   }
